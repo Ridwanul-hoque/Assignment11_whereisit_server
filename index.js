@@ -35,15 +35,15 @@ async function run() {
 
 
         app.get('/non-recovered/full', async (req, res) => {
-            const cursor = lostfindCollection.find()
-            const result = await cursor.toArray();
-            res.send(result)
-        })
-        app.get('/non-recovered', async (req, res) => {
             const cursor = lostfindCollection.find().limit(4)
             const result = await cursor.toArray();
             res.send(result)
         })
+        // app.get('/non-recovered', async (req, res) => {
+        //     const cursor = lostfindCollection.find()
+        //     const result = await cursor.toArray();
+        //     res.send(result)
+        // })
 
 
         app.get('/non-recovered/lost', async (req, res) => {
@@ -59,31 +59,41 @@ async function run() {
         });
 
 
-        app.get('/non-recovered/full/:id', async (req, res) => {
-            const id = req.params.id;
-            const query = { _id: new ObjectId(id) }
-            const result = await lostfindCollection.findOne(query)
-            res.send(result)
-        })
+        // app.get('/non-recovered/full/:id', async (req, res) => {
+        //     const id = req.params.id;
+        //     const query = { _id: new ObjectId(id) }
+        //     const result = await lostfindCollection.findOne(query)
+        //     res.send(result)
+        // })
         app.get('/non-recovered/:id', async (req, res) => {
             const id = req.params.id;
             const query = { _id: new ObjectId(id) }
             const result = await lostfindCollection.findOne(query)
             res.send(result)
         })
-        app.get('/non-recovered/found/:id', async (req, res) => {
-            const id = req.params.id;
-            const query = { _id: new ObjectId(id) }
-            const result = await lostfindCollection.findOne(query)
+        // app.get('/non-recovered/found/:id', async (req, res) => {
+        //     const id = req.params.id;
+        //     const query = { _id: new ObjectId(id) }
+        //     const result = await lostfindCollection.findOne(query)
+        //     res.send(result)
+        // })
+        // app.get('/non-recovered/lost/:id', async (req, res) => {
+        //     const id = req.params.id;
+        //     const query = { _id: new ObjectId(id) }
+        //     const result = await lostfindCollection.findOne(query)
+        //     res.send(result)
+        // })
+
+        app.get('/non-recovered', async(req, res) => {
+            const email = req.query.email;
+            const query = {email: email}
+            const result = await lostfindCollection.find(query).toArray();
             res.send(result)
         })
-        app.get('/non-recovered/lost/:id', async (req, res) => {
-            const id = req.params.id;
-            const query = { _id: new ObjectId(id) }
-            const result = await lostfindCollection.findOne(query)
-            res.send(result)
-        })
-        app.post('/non-recovered/full', async (req, res) => {
+        
+
+
+        app.post('/non-recovered', async (req, res) => {
             const newBook = req.body;
             const result = await lostfindCollection.insertOne(newBook)
             res.send(result)
@@ -94,7 +104,7 @@ async function run() {
 
 
         // recovered
-        
+
         app.post('/recovered', async (req, res) => {
             const { recoveredLocation, recoveredDate, recoveredBy } = req.body;
 
@@ -113,7 +123,7 @@ async function run() {
             res.status(201).send({ message: "Recovered item added successfully.", result });
         });
 
-        
+
         app.get('/recovered', async (req, res) => {
             const email = req.query.email;
             if (!email) {
