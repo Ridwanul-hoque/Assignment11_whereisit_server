@@ -39,11 +39,11 @@ async function run() {
             const result = await cursor.toArray();
             res.send(result)
         })
-        // app.get('/non-recovered', async (req, res) => {
-        //     const cursor = lostfindCollection.find()
-        //     const result = await cursor.toArray();
-        //     res.send(result)
-        // })
+        app.get('/non-recovered/allItems', async (req, res) => {
+            const cursor = lostfindCollection.find()
+            const result = await cursor.toArray();
+            res.send(result)
+        })
 
 
         app.get('/non-recovered/lost', async (req, res) => {
@@ -98,6 +98,50 @@ async function run() {
             const result = await lostfindCollection.insertOne(newBook)
             res.send(result)
         })
+
+
+
+        app.put('/non-recovered/:id', async (req, res) => {
+            try {
+                const id = req.params.id;
+                const updatedItem = req.body;
+                
+                // Update the item in the database
+                const result = await lostfindCollection.updateOne(
+                    { _id: new ObjectId(id) },
+                    { $set: updatedItem }
+                );
+        
+                if (result.modifiedCount === 0) {
+                    return res.status(404).send({ message: 'Item not found or no changes made' });
+                }
+        
+                res.status(200).send({ message: 'Item updated successfully' });
+            } catch (error) {
+                console.error('Error updating item:', error);
+                res.status(500).send({ message: 'Failed to update the item' });
+            }
+        });
+
+        app.delete('/non-recovered/:id', async (req, res) => {
+            try {
+                const id = req.params.id;
+        
+                // Delete the item from the database
+                const result = await lostfindCollection.deleteOne({ _id: new ObjectId(id) });
+        
+                if (result.deletedCount === 0) {
+                    return res.status(404).send({ message: 'Item not found' });
+                }
+        
+                res.status(200).send({ message: 'Item deleted successfully' });
+            } catch (error) {
+                console.error('Error deleting item:', error);
+                res.status(500).send({ message: 'Failed to delete the item' });
+            }
+        });
+        
+        
 
 
 
