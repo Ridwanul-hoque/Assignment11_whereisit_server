@@ -45,6 +45,7 @@ async function run() {
             res.send(result)
         })
 
+
         app.get('/non-recovered/lost', async (req, res) => {
             const cursor = lostfindCollection.find({ postType: "Lost" }).limit(4);
             const result = await cursor.toArray();
@@ -82,12 +83,18 @@ async function run() {
             const result = await lostfindCollection.findOne(query)
             res.send(result)
         })
+        app.post('/non-recovered/full', async (req, res) => {
+            const newBook = req.body;
+            const result = await lostfindCollection.insertOne(newBook)
+            res.send(result)
+        })
 
 
 
 
 
         // recovered
+        
         app.post('/recovered', async (req, res) => {
             const { recoveredLocation, recoveredDate, recoveredBy } = req.body;
 
@@ -102,13 +109,20 @@ async function run() {
                 createdAt: new Date(),
             };
 
-            try {
-                const result = await recoverCollection.insertOne(newRecoveredItem);
-                res.status(201).send({ message: "Recovered item added successfully.", result });
-            } catch (error) {
-                console.error("Error adding recovered item:", error);
-                res.status(500).send({ message: "Failed to add recovered item." });
+            const result = await recoverCollection.insertOne(newRecoveredItem);
+            res.status(201).send({ message: "Recovered item added successfully.", result });
+        });
+
+        
+        app.get('/recovered', async (req, res) => {
+            const email = req.query.email;
+            if (!email) {
+                return res.status(400).send({ message: "Email query parameter is required." });
             }
+            const query = { "recoveredBy.email": email };
+            const cursor = recoverCollection.find(query);
+            const result = await cursor.toArray();
+            res.send(result);
         });
 
 
